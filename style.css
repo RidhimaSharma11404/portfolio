@@ -1194,3 +1194,95 @@ input:focus, textarea:focus {
 .voice-icon.playing {
     color: var(--accent-teal);
 }
+
+/* ==========================================================================
+   Custom Profile Visual Card (Non-AI template)
+   ========================================================================== */
+.profile-details-card {
+    text-align: center;
+    padding: 40px 30px;
+}
+
+.profile-card-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.large-profile-image {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    box-shadow: 0 0 20px var(--primary-glow);
+    transition: var(--transition-smooth);
+}
+
+.large-profile-image:hover {
+    transform: scale(1.05) rotate(5deg);
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 25px var(--accent-teal-glow);
+}
+
+.profile-card-name {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+}
+
+.profile-card-title {
+    font-size: 0.95rem;
+    color: var(--accent-teal);
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.profile-card-tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.profile-card-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-glass);
+    border-radius: 100px;
+    color: var(--text-muted);
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: center;
+}
+
+.leetcode-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition-smooth);
+}
+
+.leetcode-stat svg {
+    color: #ffa116;
+}
+
+.leetcode-stat:hover {
+    background: rgba(255, 161, 22, 0.1);
+    border-color: #ffa116;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 161, 22, 0.15);
+}
