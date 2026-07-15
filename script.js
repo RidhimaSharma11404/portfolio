@@ -102,4 +102,72 @@ document.addEventListener('DOMContentLoaded', () => {
             contactForm.classList.remove('hidden');
         });
     }
+
+    // 5. Speech Synthesis (Text to Speech Intro)
+    const btnPlayVoice = document.getElementById('btn-play-voice');
+    if (btnPlayVoice) {
+        let synth = window.speechSynthesis;
+        let utterance = null;
+        let isSpeaking = false;
+
+        const introText = "Hi there! I am Ridhima Sharma, a Software Engineering and Machine Learning student at VIT Bhopal. Welcome to my portfolio! I specialize in full-stack web applications, machine learning diagnostics, and RAG systems. Feel free to explore my internships and projects, and let's connect!";
+
+        btnPlayVoice.addEventListener('click', () => {
+            if (isSpeaking) {
+                synth.cancel();
+                setSpeakingState(false);
+            } else {
+                utterance = new SpeechSynthesisUtterance(introText);
+                
+                // Try to find a nice female English voice
+                const voices = synth.getVoices();
+                const femaleVoice = voices.find(voice => 
+                    voice.name.includes('Google US English') || 
+                    voice.name.includes('Zira') || 
+                    voice.name.includes('Female') ||
+                    (voice.lang.startsWith('en') && voice.name.toLowerCase().includes('natural'))
+                );
+                if (femaleVoice) utterance.voice = femaleVoice;
+                
+                utterance.rate = 0.95; // Slightly slower for clarity
+                utterance.pitch = 1.05; // Slightly pleasant pitch
+
+                utterance.onend = () => {
+                    setSpeakingState(false);
+                };
+
+                utterance.onerror = () => {
+                    setSpeakingState(false);
+                };
+
+                setSpeakingState(true);
+                synth.speak(utterance);
+            }
+        });
+
+        // Cancel voice if user navigates away or refreshes
+        window.addEventListener('beforeunload', () => {
+            synth.cancel();
+        });
+
+        function setSpeakingState(speaking) {
+            isSpeaking = speaking;
+            const icon = btnPlayVoice.querySelector('i');
+            const span = btnPlayVoice.querySelector('span');
+            const eq = btnPlayVoice.querySelector('.equalizer');
+
+            if (speaking) {
+                icon.setAttribute('data-lucide', 'square');
+                icon.classList.add('playing');
+                span.textContent = 'Pause Intro';
+                eq.classList.remove('hidden');
+            } else {
+                icon.setAttribute('data-lucide', 'volume-2');
+                icon.classList.remove('playing');
+                span.textContent = 'Listen to Intro';
+                eq.classList.add('hidden');
+            }
+            lucide.createIcons();
+        }
+    }
 });
