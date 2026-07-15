@@ -109,43 +109,101 @@ document.addEventListener('DOMContentLoaded', () => {
         let synth = window.speechSynthesis;
         let utterance = null;
         let isSpeaking = false;
+        let hasInteracted = false;
 
         const introText = "Hi there! I am Ridhima Sharma, a Software Engineering and Machine Learning student at VIT Bhopal. Welcome to my portfolio! I specialize in full-stack web applications, machine learning diagnostics, and RAG systems. Feel free to explore my internships and projects, and let's connect!";
 
-        btnPlayVoice.addEventListener('click', () => {
-            if (isSpeaking) {
-                synth.cancel();
-                setSpeakingState(false);
-            } else {
-                utterance = new SpeechSynthesisUtterance(introText);
-                
-                // Try to find a nice female English voice
-                const voices = synth.getVoices();
-                const femaleVoice = voices.find(voice => 
-                    voice.name.includes('Google US English') || 
-                    voice.name.includes('Zira') || 
-                    voice.name.includes('Female') ||
-                    (voice.lang.startsWith('en') && voice.name.toLowerCase().includes('natural'))
-                );
-                if (femaleVoice) utterance.voice = femaleVoice;
-                
-                utterance.rate = 0.95; // Slightly slower for clarity
-                utterance.pitch = 1.05; // Slightly pleasant pitch
+        // Pre-initialize voice list triggers
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = () => {};
+        }
 
-                utterance.onend = () => {
-                    setSpeakingState(false);
-                };
+        function speak() {
+            if (isSpeaking) return;
+            
+            synth.cancel(); // Reset any queuing
 
-                utterance.onerror = () => {
-                    setSpeakingState(false);
-                };
+            utterance = new SpeechSynthesisUtterance(introText);
+            
+            // Try to find a nice female English voice
+            const voices = synth.getVoices();
+            const femaleVoice = voices.find(voice => 
+                voice.name.includes('Google US English') || 
+                voice.name.includes('Zira') || 
+                voice.name.includes('Female') ||
+                (voice.lang.startsWith('en') && voice.name.toLowerCase().includes('natural'))
+            );
+            if (femaleVoice) utterance.voice = femaleVoice;
+            
+            utterance.rate = 0.95; 
+            utterance.pitch = 1.05;
 
+            utterance.onstart = () => {
                 setSpeakingState(true);
-                synth.speak(utterance);
+            };
+
+            utterance.onend = () => {
+                setSpeakingState(false);
+            };
+
+            utterance.onerror = (e) => {
+                console.warn("Speech synthesis issue: ", e);
+                setSpeakingState(false);
+            };
+
+            synth.speak(utterance);
+        }
+
+        function stopSpeaking() {
+            synth.cancel();
+            setSpeakingState(false);
+        }
+
+        btnPlayVoice.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hasInteracted = true;
+            removeInteractionListeners();
+            if (isSpeaking) {
+                stopSpeaking();
+            } else {
+                speak();
             }
         });
 
-        // Cancel voice if user navigates away or refreshes
+        // Trigger autoplay logic on first user interaction
+        function triggerAutoplay() {
+            if (hasInteracted) return;
+            hasInteracted = true;
+            removeInteractionListeners();
+            speak();
+        }
+
+        function handleUserInteraction() {
+            triggerAutoplay();
+        }
+
+        // Listen for early page interactions
+        window.addEventListener('click', handleUserInteraction);
+        window.addEventListener('scroll', handleUserInteraction);
+        window.addEventListener('mousemove', handleUserInteraction);
+        window.addEventListener('touchstart', handleUserInteraction);
+
+        function removeInteractionListeners() {
+            window.removeEventListener('click', handleUserInteraction);
+            window.removeEventListener('scroll', handleUserInteraction);
+            window.removeEventListener('mousemove', handleUserInteraction);
+            window.removeEventListener('touchstart', handleUserInteraction);
+        }
+
+        // Try to trigger immediately on load (in case browser allows it)
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (!hasInteracted) {
+                    speak();
+                }
+            }, 800);
+        });
+
         window.addEventListener('beforeunload', () => {
             synth.cancel();
         });
